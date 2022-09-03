@@ -46,11 +46,11 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: '3.9'
-      - name: run black
+      - name: run isort
         working-directory: ./r_dogecoin_bot
         run: |
           pip install isort==5.10.1
-          isort src
+          isort .
 
   create-release:
     needs: [linter, black, isort]
