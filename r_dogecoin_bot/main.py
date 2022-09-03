@@ -29,7 +29,7 @@ class DogecoinMemeBot:
         )
 
     async def run(self):
-        sub_ids: List[str] = self.db_client.get_existing_ids()
+        sub_ids: List[str] = await self.db_client.get_existing_ids()
         config_data: RedditClientConfig = copy.deepcopy(self.reddit_client_config)
 
         async with ClientSession(trust_env=True) as session:

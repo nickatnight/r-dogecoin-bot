@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "r-dogecoin-bot"
-version = "0.1.2"
+version = "0.1.3"
 description = "Top meme posts from r/dogecoin which include 'Meme' flair."
 authors = ["nickatnight <nickkelly.858@gmail.com>"]
 readme = "README.md"
