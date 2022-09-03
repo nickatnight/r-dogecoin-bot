@@ -11,6 +11,8 @@ from asyncpraw import models
 from sqlalchemy.ext.asyncio import AsyncSession  # postgres
 from motor.motor_asyncio import AsyncIOMotorClient  # mongo
 from r_dogecoin_bot.clients.database import AbstractDbClient
+from r_dogecoin_bot.main import DogecoinMemeBot
+from r_dogecoin_bot.types import RedditClientConfig
 
 from my_db_session_config import get_database_psql, get_database_mongo
 from my_schema import MySchema
@@ -18,7 +20,7 @@ from my_schema import MySchema
 
 class PostgresSubmissionDbClient(AbstractDbClient[models.Submission, AsyncSession, MySchema]):
     session: AsyncSession = get_database_psql()
-    schema: MySchema
+    schema: MySchema = MySchema
 
     @classmethod
     async def process(cls, model: models.Submission) -> None:
@@ -46,7 +48,7 @@ class PostgresSubmissionDbClient(AbstractDbClient[models.Submission, AsyncSessio
 
 class MongoSubmissionDbClient(AbstractDbClient[models.Submission, AsyncIOMotorClient, MySchema]):
     session: AsyncIOMotorClient = get_database_mongo()
-    schema: MySchema
+    schema: MySchema = MySchema
 
     @classmethod
     async def process(cls, model: models.Submission) -> None:
@@ -66,6 +68,26 @@ class MongoSubmissionDbClient(AbstractDbClient[models.Submission, AsyncIOMotorCl
     async def get_existing_ids(cls) -> List[str]:
         result = await cls.session["meme_collection"].distinct("submission_id")
         return result
+
+
+async def main():
+    reddit_config: RedditClientConfig = dict(
+        client_id="much_client,
+        client_secret="very_secret",
+        user_agent="to_the_moon",
+    )
+    db_client: AbstractDbClient = PostgresSubmissionDbClient()
+    bot = DogecoinMemeBot(
+        reddit_client_config=reddit_config,
+        db_client=PostgresSubmissionDbClient,
+    )
+
+    await bot.run()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
 ```
 
 ## Development
