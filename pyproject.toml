@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "r-dogecoin-bot"
+version = "0.1.0"
+description = "Top meme posts from r/dogecoin which include 'Meme' flair."
+authors = ["nickatnight <nickkelly.858@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/nickatnight/r-dogecoin-bot"
+repository = "https://github.com/nickatnight/r-dogecoin-bot"
+
+[tool.poetry.scripts]
+botnet = "r_dogecoin_bot.main:main"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+colorama = "^0.4.4"
+emoji = "^1.2.0"
+requests = "2.28.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+black = "22.6.0"
+flake8 = "3.9.2"
+isort = "5.10.1"
+pytest-cov = "^2.12.0"
+
+[tool.isort]
+multi_line_output = 3
+lines_after_imports = 2
+line_length = 88
+include_trailing_comma = true
+sections = 'FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER'
+
+[tool.black]
+line-length = 110
+include = '\.pyi?$'
+exclude = '(\.git|\.hg|\.mypy_cache|\.tox|\.venv|_build)'
+
+[build-system]
+requires = ["setuptools", "poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,12 @@
+.DS_Store
+.env
+
+dist/
+
+__pycache__
+.pytest_cache
+*.out
+
+htmlcov/
+coverage.xml
+.coverage
