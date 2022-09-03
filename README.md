@@ -7,6 +7,8 @@ This bot was scaffolded with my [base reddit bot](https://github.com/nickatnight
 ## Usage
 Subclass database client `AbstractDbClient` and override it's abstract methods to interface with your db client(s)
 ```python
+import asyncio
+
 from asyncpraw import models
 from sqlalchemy.ext.asyncio import AsyncSession  # postgres
 from motor.motor_asyncio import AsyncIOMotorClient  # mongo
@@ -72,11 +74,10 @@ class MongoSubmissionDbClient(AbstractDbClient[models.Submission, AsyncIOMotorCl
 
 async def main():
     reddit_config: RedditClientConfig = dict(
-        client_id="much_client,
+        client_id="much_client",
         client_secret="very_secret",
         user_agent="to_the_moon",
     )
-    db_client: AbstractDbClient = PostgresSubmissionDbClient()
     bot = DogecoinMemeBot(
         reddit_client_config=reddit_config,
         db_client=PostgresSubmissionDbClient,
