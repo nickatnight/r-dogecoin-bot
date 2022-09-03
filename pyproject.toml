@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "r-dogecoin-bot"
-version = "0.1.1"
+version = "0.1.2"
 description = "Top meme posts from r/dogecoin which include 'Meme' flair."
 authors = ["nickatnight <nickkelly.858@gmail.com>"]
 readme = "README.md"
@@ -12,9 +12,7 @@ botnet = "r_dogecoin_bot.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-colorama = "^0.4.4"
-emoji = "^1.2.0"
-requests = "2.28.1"
+asyncpraw = "^7.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

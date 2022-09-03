@@ -37,8 +37,8 @@ class PostgresSubmissionDbClient(AbstractDbClient[models.Submission, AsyncSessio
             }
         )
         cls.session.add(my_model)
-        await session.commit()
-        await session.refresh(my_model)
+        await cls.session.commit()
+        await cls.session.refresh(my_model)
 
     @classmethod
     async def get_existing_ids(cls) -> List[str]:
