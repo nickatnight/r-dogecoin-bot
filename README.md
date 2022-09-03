@@ -10,65 +10,65 @@ Subclass database client `AbstractDbClient` and override it's abstract methods t
 import asyncio
 
 from asyncpraw import models
-from sqlalchemy.ext.asyncio import AsyncSession  # postgres
-from motor.motor_asyncio import AsyncIOMotorClient  # mongo
 from r_dogecoin_bot.clients.database import AbstractDbClient
 from r_dogecoin_bot.main import DogecoinMemeBot
 from r_dogecoin_bot.types import RedditClientConfig
 
-from my_db_session_config import get_database_psql, get_database_mongo
+from my_db_session_config import async_session
 from my_schema import MySchema
 
 
-class PostgresSubmissionDbClient(AbstractDbClient[models.Submission, AsyncSession, MySchema]):
-    session: AsyncSession = get_database_psql()
+class PostgresSubmissionDbClient(AbstractDbClient[models.Submission, MySchema]):
     schema: MySchema = MySchema
 
     @classmethod
     async def process(cls, model: models.Submission) -> None:
-        my_model: MySchema = cls.schema(
-            **{
-                "submission_title": model.title,
-                "submission_url": model.url,
-                "submission_id": model.id,
-                "permalink": model.permalink,
-                "author": model.author.name,
-                "created": model.created_utc,
-            }
-        )
-        cls.session.add(my_model)
-        await cls.session.commit()
-        await cls.session.refresh(my_model)
+        async with async_session() as session:
+            my_model: MySchema = cls.schema(
+                **{
+                    "submission_title": model.title,
+                    "submission_url": model.url,
+                    "submission_id": model.id,
+                    "permalink": model.permalink,
+                    "author": model.author.name,
+                    "created": model.created_utc,
+                }
+            )
+            session.add(my_model)
+            await session.commit()
+            await session.refresh(my_model)
 
     @classmethod
     async def get_existing_ids(cls) -> List[str]:
-        result = await cls.session.execute(
-            select(MySchema.submission_id)
-        )
+        async with async_session() as session:
+            result = await session.execute(
+                select(cls.schema.submission_id)
+            )
         return result.scalars().all()
 
 
-class MongoSubmissionDbClient(AbstractDbClient[models.Submission, AsyncIOMotorClient, MySchema]):
-    session: AsyncIOMotorClient = get_database_mongo()
+class MongoSubmissionDbClient(AbstractDbClient[models.Submission, MySchema]):
     schema: MySchema = MySchema
 
     @classmethod
     async def process(cls, model: models.Submission) -> None:
-        data: MySchema = cls.schema(
-            **{
-                "submission_title": model.title,
-                "submission_url": model.url,
-                "submission_id": model.id,
-                "permalink": model.permalink,
-                "author": model.author.name,
-                "created": model.created_utc,
-            }
-        )
-        await cls.session["myschema_collection"].insert_one(data.dict())
+        async with async_session() as session:
+            data: MySchema = cls.schema(
+                **{
+                    "submission_title": model.title,
+                    "submission_url": model.url,
+                    "submission_id": model.id,
+                    "permalink": model.permalink,
+                    "author": model.author.name,
+                    "created": model.created_utc,
+                }
+            )
+            await session["myschema_collection"].insert_one(data.dict())
 
     @classmethod
     async def get_existing_ids(cls) -> List[str]:
-        result = await cls.session["meme_collection"].distinct("submission_id")
+        async with async_session() as session:
+            result = await session["meme_collection"].distinct("submission_id")
         return result
 
 

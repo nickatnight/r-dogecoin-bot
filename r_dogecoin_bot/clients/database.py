@@ -2,13 +2,11 @@ import abc
 from typing import Generic, List, TypeVar
 
 
-SessionType = TypeVar("SessionType")
 RedditType = TypeVar("RedditType")
 SchemaType = TypeVar("SchemaType")
 
 
-class AbstractDbClient(Generic[RedditType, SessionType, SchemaType], abc.ABC):
-    db: SessionType
+class AbstractDbClient(Generic[RedditType, SchemaType], abc.ABC):
     schema: SchemaType
 
     @classmethod
