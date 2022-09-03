@@ -1,6 +1,8 @@
-# :dog: :space_invader: docker-reddit-bot-base
+# :dog: :space_invader: r-dogecoin-bot
 
-A useless bot that fetches top meme posts from r/dogecoin which include 'Meme' flair. I shut [this](https://github.com/public-apis/public-apis/blob/master/README.md?plain=1#L1502) public api down in 2021, but decided to decouple the Reddit logic out of the api and into a stanalone library. Mostly using it to plug into [this](https://github.com/nickatnight/fastapi-backend-base) base project. Because....why not?
+A useless bot that fetches top meme posts from r/dogecoin which include 'Meme' flair. I shut [my](https://github.com/public-apis/public-apis/blob/master/README.md?plain=1#L1502) public api down in 2021, but decided to decouple the Reddit logic out of the api and into a stanalone library. Mostly using it to plug into [this](https://github.com/nickatnight/fastapi-backend-base) base project. Because....why not?
+
+This bot was scaffolded with my [base reddit bot](https://github.com/nickatnight/docker-reddit-bot-base)
 
 ## Usage
 Subclass database client `AbstractDbClient` and override it's abstract methods to interface with your db client(s)
@@ -16,17 +18,18 @@ from my_schema import MySchema
 
 class PostgresSubmissionDbClient(AbstractDbClient[models.Submission, AsyncSession, MySchema]):
     session: AsyncSession = get_database_psql()
+    schema: MySchema
 
     @classmethod
     async def process(cls, model: models.Submission) -> None:
-        my_model: MySchema = MySchema(
+        my_model: MySchema = cls.schema(
             **{
-                "submission_title": submission.title,
-                "submission_url": submission.url,
-                "submission_id": submission.id,
-                "permalink": submission.permalink,
-                "author": submission.author.name,
-                "created": submission.created_utc,
+                "submission_title": model.title,
+                "submission_url": model.url,
+                "submission_id": model.id,
+                "permalink": model.permalink,
+                "author": model.author.name,
+                "created": model.created_utc,
             }
         )
         cls.session.add(my_model)
@@ -43,17 +46,18 @@ class PostgresSubmissionDbClient(AbstractDbClient[models.Submission, AsyncSessio
 
 class MongoSubmissionDbClient(AbstractDbClient[models.Submission, AsyncIOMotorClient, MySchema]):
     session: AsyncIOMotorClient = get_database_mongo()
+    schema: MySchema
 
     @classmethod
     async def process(cls, model: models.Submission) -> None:
-        data = MySchema(
+        data: MySchema = cls.schema(
             **{
-                "submission_title": submission.title,
-                "submission_url": submission.url,
-                "submission_id": submission.id,
-                "permalink": submission.permalink,
-                "author": submission.author.name,
-                "created": submission.created_utc,
+                "submission_title": model.title,
+                "submission_url": model.url,
+                "submission_id": model.id,
+                "permalink": model.permalink,
+                "author": model.author.name,
+                "created": model.created_utc,
             }
         )
         await cls.session["myschema_collection"].insert_one(data.dict())

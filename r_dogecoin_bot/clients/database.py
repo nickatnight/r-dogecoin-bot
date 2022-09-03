@@ -9,6 +9,7 @@ SchemaType = TypeVar("SchemaType")
 
 class AbstractDbClient(Generic[RedditType, SessionType, SchemaType], abc.ABC):
     db: SessionType
+    schema: SchemaType
 
     @classmethod
     @abc.abstractmethod

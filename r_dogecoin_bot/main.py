@@ -2,7 +2,7 @@
 
 import asyncio
 import copy
-from typing import List, Type
+from typing import List, Optional
 
 import asyncpraw
 from aiohttp import ClientSession
@@ -18,11 +18,15 @@ default_user_agent = "botnet| v1 | By nickatnight"
 class DogecoinMemeBot:
     """much meme, very api"""
 
-    def __init__(self, reddit_client_config: RedditClientConfig, db_client: Type[AbstractDbClient]):
+    def __init__(
+        self, reddit_client_config: RedditClientConfig, db_client: Optional[AbstractDbClient]
+    ):
         self.reddit_client_config = reddit_client_config
         self.db_client = db_client
 
-        logger.info(f"Starting up... {default_user_agent}")
+        logger.info(
+            f"Starting up... {self.reddit_client_config.get('user_agent') or default_user_agent}"
+        )
 
     async def run(self):
         sub_ids: List[str] = self.db_client.get_existing_ids()
@@ -32,10 +36,10 @@ class DogecoinMemeBot:
             config_data.update(requestor_kwargs={"session": session})
 
             async with asyncpraw.Reddit(**config_data) as reddit:
-                subreddit = await reddit.subreddit("dogecoin")
+                subreddit: asyncpraw.models.Subreddit = await reddit.subreddit("dogecoin")
 
                 async for submission in subreddit.hot():
-                    skip = submission.id in sub_ids or submission.link_flair_text != "Meme"
+                    skip: bool = submission.id in sub_ids or submission.link_flair_text != "Meme"
 
                     if not skip:
                         if getattr(self, "db_client"):
